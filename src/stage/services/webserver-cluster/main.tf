@@ -85,3 +85,10 @@ resource "aws_security_group" "elb" {
   }
 }
 
+terraform {
+  backend "s3" {
+    bucket = "terraform-up-and-running-jb"
+    key    = "state/services/webserver-cluster/terraform.tfstate"
+    region = "us-east-1"
+  }
+}
