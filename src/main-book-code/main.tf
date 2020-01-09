@@ -2,11 +2,6 @@ provider "aws" {
   region = "us-east-1"
 }
 
-variable "server_port" {
-  description = "The port used for http requests"
-  default = 8080
-
-}
 resource "aws_security_group" "instance" {
   name = "terraform-example-instance"
   ingress {
@@ -21,12 +16,7 @@ resource "aws_security_group" "instance" {
   }
 
 }
-output "elb_dns_name" {
-  value = "${aws_elb.example.dns_name}"
-}
-output "debug"{
-  value = ["${data.aws_availability_zones.all.names}"]
-}
+
 
 resource "aws_launch_configuration" "example" {
   image_id = "ami-40d28157"
