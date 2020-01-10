@@ -1,3 +1,11 @@
+terraform {
+  backend "s3" {
+    bucket = "terraform-up-and-running-jb"
+    key = "state/services/webserver-cluster/terraform.tfstate"
+    region = "us-east-1"
+  }
+}
+
 provider "aws" {
   region = "us-east-1"
 }
@@ -22,11 +30,7 @@ resource "aws_launch_configuration" "example" {
   image_id = "ami-40d28157"
   instance_type = "t2.micro"
   security_groups = ["${aws_security_group.instance.id}"]
-  user_data = <<-EOF
-    #!/bin/bash
-    echo "Hello, World, startup date : `date` " > index.html
-    nohup busybox httpd -f -p ${var.server_port} &
-  EOF
+  user_data = data.template_file.user_data.rendered
   lifecycle {
     create_before_destroy = true
   }
@@ -46,7 +50,6 @@ resource "aws_autoscaling_group" "example" {
   }
 }
 
-data "aws_availability_zones" "all" {}
 
 resource "aws_elb" "example" {
   name = "terraform-asg-example"
@@ -85,10 +88,22 @@ resource "aws_security_group" "elb" {
   }
 }
 
-terraform {
-  backend "s3" {
+data "aws_availability_zones" "all" {}
+
+data "terraform_remote_state" "db" {
+  backend = "s3"
+  config = {
     bucket = "terraform-up-and-running-jb"
-    key    = "state/services/webserver-cluster/terraform.tfstate"
+    key = "state/services/mysql-cluster/terraform.tfstate"
     region = "us-east-1"
+  }
+}
+
+data "template_file" "user_data" {
+  template = "${file("bin/start-webserver.sh")}"
+  vars = {
+    server_port = "${var.server_port}"
+    db_address = "${data.terraform_remote_state.db.outputs.address}"
+    db_port = "${data.terraform_remote_state.db.outputs.port}"
   }
 }
