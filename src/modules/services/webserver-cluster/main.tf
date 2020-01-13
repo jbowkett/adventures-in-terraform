@@ -85,8 +85,8 @@ data "aws_availability_zones" "all" {}
 data "terraform_remote_state" "db" {
   backend = "s3"
   config = {
-    bucket = "terraform-up-and-running-jb"
-    key = "state/services/mysql-cluster/terraform.tfstate"
+    bucket = "${var.db_remote_state_bucket}"
+    key = "${var.db_remote_state_key}"
     region = "us-east-1"
   }
 }
