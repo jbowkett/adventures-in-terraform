@@ -1,3 +1,11 @@
+terraform {
+  backend "s3" {
+    bucket = "terraform-up-and-running-jb"
+    key = "state/services/webserver-cluster/stage-terraform.tfstate"
+    region = "us-east-1"
+  }
+}
+
 provider "aws" {
   region = "us-east-1"
 }
