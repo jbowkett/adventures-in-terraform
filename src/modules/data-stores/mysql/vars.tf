@@ -3,7 +3,7 @@ variable "db_password" {
 }
 
 variable instance_class {
-  type = "string"
+  type = string
   default = "db.t2.micro"
 }
 

@@ -1,22 +1,19 @@
 terraform {
   backend "s3" {
     bucket = "terraform-up-and-running-jb"
-    key    = "state/services/mysql-cluster/terraform.tfstate"
+    key = "state/data-stores/mysql/stage-terraform.tfstate"
     region = "us-east-1"
-    encrypt = "true"
+    encrypt = true
   }
 }
+
 provider "aws" {
   region = "us-east-1"
 }
 
-resource "aws_db_instance" "example" {
-  engine            = "mysql"
-  identifier        = "jb-example-database-2"
-  allocated_storage = 10
-  instance_class    = "${var.instance_class}"
-  name              = "example_database_2"
-  username          = "admin"
-  password          = "${var.db_password}"
-  skip_final_snapshot = true
+module "mysql" {
+  source = "../../../modules/data-stores/mysql"
+  db_password = "pa55word!"
+  instance_class = "db.t2.micro"
 }
+
